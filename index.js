@@ -1,26 +1,28 @@
-// dependencies
-const express = require('express');
-const axios = require('axios');
-const crypto = require('crypto');
-const FormData = require('form-data');
+import express from 'express';
+import axios from 'axios';
+import crypto from 'crypto';
+import FormData from 'form-data';
 
 const app = express();
 app.use(express.json());
 
-// your Cloudinary config
+// Cloudinary config
 const CLOUD_NAME = 'your_cloud_name';
 const API_KEY = 'your_api_key';
 const API_SECRET = 'your_api_secret';
 const FOLDER_NAME = 'uploaded_from_voiceflow';
 
 function generateSignature(paramsToSign) {
-  const sortedParams = Object.keys(paramsToSign).sort().map(key => `${key}=${paramsToSign[key]}`).join('&');
-  const signature = crypto.createHash('sha1').update(sortedParams + API_SECRET).digest('hex');
-  return signature;
+  const sortedParams = Object.keys(paramsToSign)
+    .sort()
+    .map((key) => `${key}=${paramsToSign[key]}`)
+    .join('&');
+
+  return crypto.createHash('sha1').update(sortedParams + API_SECRET).digest('hex');
 }
 
 app.post('/upload-images', async (req, res) => {
-  const imageUrls = req.body.image_urls_combined; // assume this is an array of URLs
+  const imageUrls = req.body.image_urls_combined;
 
   if (!Array.isArray(imageUrls) || imageUrls.length === 0) {
     return res.status(400).json({ error: 'No image URLs provided' });
@@ -30,7 +32,7 @@ app.post('/upload-images', async (req, res) => {
     const timestamp = Math.floor(Date.now() / 1000);
     const uploadResults = [];
 
-    for (const [index, imageUrl] of imageUrls.entries()) {
+    for (const imageUrl of imageUrls) {
       const paramsToSign = {
         folder: FOLDER_NAME,
         timestamp,
@@ -53,7 +55,6 @@ app.post('/upload-images', async (req, res) => {
       uploadResults.push(uploadResponse.data.secure_url);
     }
 
-    // return array of public image URLs as fallback
     res.json({
       message: 'Uploaded successfully!',
       image_urls: uploadResults,
@@ -67,4 +68,5 @@ app.post('/upload-images', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+
 
