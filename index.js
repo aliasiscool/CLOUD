@@ -29,16 +29,17 @@ app.post("/upload", async (req, res) => {
 
     const uploadedUrls = [];
 
-    for (let url of urls) {
+   for (let url of urls) {
   const response = await cloudinary.v2.uploader.upload(url.trim(), {
-  folder: folderName,
-  type: "upload",
-  resource_type: "image",
-  fetch_format: "auto"
-});
+    folder: folderName,
+    use_filename: true,
+    unique_filename: false,
+    overwrite: false,
+    resource_type: "image"
+  });
+  uploadedUrls.push(response.secure_url);
+}
 
-      uploadedUrls.push(response.secure_url);
-    }
 
     return res.status(200).json({
       success: true,
