@@ -1,7 +1,8 @@
-import express from 'express';
-import axios from 'axios';
-import crypto from 'crypto';
-import FormData from 'form-data';
+const express = require('express');
+const multer = require('multer');
+const axios = require('axios');
+const FormData = require('form-data');
+
 
 const app = express();
 app.use(express.json());
